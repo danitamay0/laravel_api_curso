@@ -1,0 +1,77 @@
+CONCEPTOS NUEVOS
+
+
+SCOPES son metodos de alcance a objetos, con funcionalidades a base  de datos , que
+permiten implementar una regla de consulta para todo su modelo, estos scopes extendien de
+scope y por parametro reciben un BUIDER y un Model el builder construlle la regla de consult
+puede ser con el metodo has(), y posteriormente se crea en el modelo con la un metodo protected
+static llamado boot , que a la vez extiende de su padre, este metodo tiene un sub metodo static
+static::addGlobalScope(Nombre de scope)
+BOOT es un constructor de consultas que esta en los modelos de datos
+
+traits: funciones que se implementan para evitar ser re-escritas en los controladores que se 
+utilicen, dichos traites se instancian en un controllador  padre y se heredan al resto, asi
+se hace un codigo mas optimo
+excepcions: las excepcions tienen las respuestas del servidor cuando ocurre un error de consulta
+de modelo, generalmente respuestas HTTP
+
+softDelete: soft delete permite agregar una fecha a la base de datos cuando se elimina, pero no desaparece del todo
+solo se oculta, para hacer eso hay que:
+1) use SoftDeletes en el modelo
+2)en la migracion agregar $table->SoftDeletes
+3) crear una variable protected date= ['deleted_at] para que laravel trate ese dato como una fecha
+
+controller injection: php artisan make:construller CategoryController -r(resourse - crea metodos por default) -m category(modelo que usa para inyect)
+
+injetion implicita: en metodos de controllers cuando se busca por id, y viene por parametro 
+request, podemos hacer una injection implicita del modelo donde laravel se encarga de buscar
+por el id, si existe continua si no manda un mensaje (User $user)
+METODOS={
+HAS('TRANSACTIOS') metodo que relaciona con eloquent si un modelo esta inmerso en otro
+FindOrFail busca o falla , si no encuentra el modelo devuelve una respuesta de error
+
+syncWithoutDetaching
+nos ayuda a incorparar datos en una relacion de muchos a muchos ejemplo productos -> categirias 
+$product->categories()->syncWithoutDetaching([$category->id]) de esta manera incluimos datos sin repeterlos a nuestra tabla
+
+attach cumple la misma funcion pero deja incorporar datos repetidos 
+
+detach
+ayuda a eliminar datos de una tabla de muchos a muchos ejemplo product -> categories
+primero buscar si existe en el product $product->categories()->find($category_id) si existe
+$product->categories()->detach([$categories->id]);
+
+}
+
+#esto hace que los eventos no sean usados en los seed
+       User::flushEventListeners();
+
+
+Email!!!
+config....
+1).env ) MAIL_DRIVER=log determina que servicio vamos a usar de Email
+2)en config/services) estan todas las configuraciones de los servicios permitidos externos
+3)log lo usamos como caja negra
+4)configuraciones en .env
+MAILGUN_DOMAIN=-----
+MAILGUN_SECRET=-----
+MAILGUN_ENDPOINT=api.mailgun.net
+
+MAIL_FROM_ADDRESS=postmaster@lara_api_curso.devel
+MAIL_FROM_NAME="Api Rest Full"  
+
+enviar correos
+1) php artisan make:email UserCreate
+2) instanciar en el constructor el modelo de usuario para poder usarlo en la vista
+3) configurar la vista
+4) return view('vista')->subject('cabecera del email');
+
+Uso del envio de email; puede ser en eventos del modelo o en controladores
+    
+       User::created(function($user){
+            Mail::to($user->email)->send(new userCreate($user));     
+       });
+
+vistas: markdown para email
+
+Metodo retry() permite reintentar un numero de vences de intento
